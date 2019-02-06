@@ -188,6 +188,12 @@ class KnowledgeBase(object):
             if fact_or_rule not in self.rules:
                 explain = "Rule is not in the KB"
                 return explain
+            explain = explain + fact_or_rule.name + ": " + str(fact_or_rule.statement)
+            index = self.facts.index(fact_or_rule)
+            fact_or_ruleInKB = self.facts[index]
+            if fact_or_ruleInKB.supported_by != []:
+                indent = 0
+                explain = self.kb_explain_supported_by(fact_or_ruleInKB, indent, explain)
 
 
 
@@ -245,6 +251,8 @@ fact: (eats nyala leaves)\n\
             explain += i[0].name + ": " + str(i[0].statement)
             if i[0].asserted:
                 explain += " ASSERTED"
+            else:
+                explain = self.kb_explain_supported_by(i[0], indent, explain)
             # supported by rules
             explain = explain + "\n"
             j = 0
