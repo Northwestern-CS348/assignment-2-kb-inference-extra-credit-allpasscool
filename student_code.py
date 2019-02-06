@@ -142,7 +142,138 @@ class KnowledgeBase(object):
         """
         ####################################################
         # Student code goes here
+        explain = ""
+        if isinstance(fact_or_rule, Fact):
+            if fact_or_rule not in self.facts:
+                explain = "Fact is not in the KB"
+                return explain
+            explain = explain + fact_or_rule.name + ": " +str(fact_or_rule.statement)
+            index = self.facts.index(fact_or_rule)
+            fact_or_ruleInKB = self.facts[index]
+            #print(self.facts[self.facts.index(fact_or_rule)].supported_by)
+            if fact_or_ruleInKB.supported_by != []:
+                indent = 0
+                #explain = explain + "\n  SUPPORTED BY"
+                #print("heree")
+                #print(explain)
+                #print("heree end")
+                explain = self.kb_explain_supported_by(fact_or_ruleInKB, indent, explain)
+                """
+                #supported by facts
+                for i in fact_or_ruleInKB.supported_by:
+                    indent += 1
+                    print(i)
+                    print()
+                    explain = explain + "\n"
+                    j = 0
+                    while j < indent:
+                        explain += "    "
+                        j += 1
+                    explain += i[0].name + ": " + str(i[0].statement)
+                    if i[0].asserted:
+                        explain += " ASSERTED"
+                #supported by rules
+                    explain = explain + "\n"
+                    j = 0
+                    while j < indent:
+                        explain += "    "
+                        j += 1
+                    explain += i[1].name + ": (" + str(i[1].lhs[0])
+                    for k in range(1, len(i[1].lhs)):
+                        explain += ", " + str(i[1], lhs[k])
+                    explain += ") -> " + str(i[1].rhs)
+                    """
 
+        else:
+            if fact_or_rule not in self.rules:
+                explain = "Rule is not in the KB"
+                return explain
+
+
+
+        print("explain")
+        print(explain)
+        print("explain end")
+        print("answer")
+
+        print('\
+fact: (eats nyala leaves)\n\
+  SUPPORTED BY\n\
+    fact: (eats herbivore leaves) ASSERTED\n\
+    rule: ((eats herbivore leaves)) -> (eats nyala leaves)\n\
+      SUPPORTED BY\n\
+        fact: (genls antelope herbivore) ASSERTED\n\
+        rule: ((genls antelope ?z), (eats ?z leaves)) -> (eats nyala leaves)\n\
+          SUPPORTED BY\n\
+            fact: (genls nyala antelope) ASSERTED\n\
+            rule: ((genls ?x ?y), (genls ?y ?z), (eats ?z leaves)) -> (eats ?x leaves) ASSERTED\n\
+  SUPPORTED BY\n\
+    fact: (isa leaves plantBasedFood) ASSERTED\n\
+    rule: ((isa ?y plantBasedFood)) -> (eats nyala ?y)\n\
+      SUPPORTED BY\n\
+        fact: (eats nyala plantBasedFood) ASSERTED\n\
+        rule: ((eats ?x plantBasedFood), (isa ?y plantBasedFood)) -> (eats ?x ?y) ASSERTED\
+')
+        print("answer end")
+        return explain
+
+    def kb_explain_supported_by(self, fact_or_ruleInKB, indent, explain):
+        # supported by facts
+        #print("enter")
+        #explain = explain + "\n"
+        #j = 0
+        #while j < indent:
+        #    explain += "    "
+        #    j += 1
+        #explain += "  SUPPORTED BY"
+        for i in fact_or_ruleInKB.supported_by:
+            explain = explain + "\n"
+            j = 0
+            while j < indent:
+                explain += "    "
+                j += 1
+            explain += "  SUPPORTED BY"
+            #print("wtf???")
+            indent += 1
+            #print(i)
+            #print()
+            explain = explain + "\n"
+            j = 0
+            while j < indent:
+                explain += "    "
+                j += 1
+            explain += i[0].name + ": " + str(i[0].statement)
+            if i[0].asserted:
+                explain += " ASSERTED"
+            # supported by rules
+            explain = explain + "\n"
+            j = 0
+            while j < indent:
+                explain += "    "
+                j += 1
+            #print("dddddddddddddddddddddddddddd")
+            #print(i)
+            #print(isinstance(i[0],Fact))
+            #print(isinstance(i[1], Rule))
+            explain += i[1].name + ": (" + str(i[1].lhs[0])
+            for k in range(1, len(i[1].lhs)):
+                explain += ", " + str(i[1].lhs[k])
+            explain += ") -> " + str(i[1].rhs)
+            if i[1].asserted:
+                explain += " ASSERTED"
+            else:
+                #j = 0
+                #explain += "\n"
+                #while j < indent:
+                #    explain += "    "
+                #    j += 1
+                #explain += " SUPPORTED BY"
+                explain = self.kb_explain_supported_by(i[1], indent, explain)
+            indent -= 1
+        #print("IN")
+        #print(explain)
+        #print("IN end")
+        return explain
 
 class InferenceEngine(object):
     def fc_infer(self, fact, rule, kb):
